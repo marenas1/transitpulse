@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Local Codex agents, skills, and workspace metadata
+/.agents/
+/.codex/

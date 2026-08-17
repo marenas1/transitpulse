@@ -1,0 +1,151 @@
+{
+  "status": "PASS",
+  "gate": "at least 10 distinct trips",
+  "feed": {
+    "name": "nyct-1-2-3-4-5-6-7",
+    "source": "fixtures/mta-nyct-gtfs.bin",
+    "httpStatus": 200,
+    "contentType": "application/x-protobuf",
+    "fetchedAt": "2026-08-17T15:24:11.718Z",
+    "feedTimestamp": "2026-08-17T15:23:02.000Z",
+    "byteLength": 186877
+  },
+  "summary": {
+    "entities": 419,
+    "tripUpdates": 255,
+    "distinctTrips": 255,
+    "decodeFailures": 0
+  },
+  "records": [
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "062400_1..S15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "142S",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:22:48.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "062700_1..N15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "101N",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:24:28.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "062900_1..S15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "136S",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:23:06.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "063250_1..N15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "108N",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:23:11.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "063400_1..S15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "130S",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:22:41.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "063800_1..N15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "111N",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:22:38.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "064000_1..S15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "128S",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:22:51.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "064300_1..N15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "113N",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:24:51.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "064500_1..S15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "126S",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:22:52.000Z",
+      "delaySeconds": 0
+    },
+    {
+      "feedName": "nyct-1-2-3-4-5-6-7",
+      "feedTimestamp": "2026-08-17T15:23:02.000Z",
+      "observedAt": "2026-08-17T15:24:11.718Z",
+      "routeId": "1",
+      "tripId": "064800_1..N15R",
+      "directionId": "0",
+      "startTime": null,
+      "stopId": "116N",
+      "scheduledArrival": null,
+      "predictedArrival": "2026-08-17T15:22:51.000Z",
+      "delaySeconds": 0
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "transitpulse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TransitPulse NYC subway observability platform",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "phase1": "tsx src/phase1/cli.ts",
+    "phase1:fixture": "TRANSITPULSE_INPUT_FILE=fixtures/mta-nyct-gtfs.bin tsx src/phase1/cli.ts",
+    "test": "tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "gtfs-realtime-bindings": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}
