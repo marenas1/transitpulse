@@ -1,0 +1,187 @@
+{
+  "status": "PASS",
+  "gate": "at least 10 realtime trips resolve to static trips and stops",
+  "source": {
+    "file": "fixtures/mta-gtfs-subway.zip",
+    "url": "https://rrgtfsfeeds.s3.amazonaws.com/gtfs_subway.zip",
+    "feedVersion": "20260807-H-rockaways-extension-removed"
+  },
+  "counts": {
+    "routes": 29,
+    "stations": 496,
+    "stops": 1488,
+    "trips": 20621,
+    "scheduledStopTimes": 565093,
+    "afterMidnightStopTimes": 18909,
+    "calendars": 7,
+    "calendarExceptions": 6
+  },
+  "serviceDate": "2026-08-17",
+  "midnightExample": {
+    "original": "24:08:00",
+    "serviceDate": "2026-08-17",
+    "normalizedLocalDateTime": "2026-08-18T00:08:00",
+    "secondsSinceServiceMidnight": 86880,
+    "dayOffset": 1
+  },
+  "resolution": {
+    "resolved": [
+      {
+        "realtimeTripId": "062400_1..S15R",
+        "staticTripId": "L0S1-1-1094-S02_062400_1..S15R",
+        "routeId": "1",
+        "stopId": "142S",
+        "stationId": "142",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "062700_1..N15R",
+        "staticTripId": "L0S1-1-1094-S02_062700_1..N15R",
+        "routeId": "1",
+        "stopId": "101N",
+        "stationId": "101",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "062900_1..S15R",
+        "staticTripId": "L0S1-1-1094-S02_062900_1..S15R",
+        "routeId": "1",
+        "stopId": "136S",
+        "stationId": "136",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "063250_1..N15R",
+        "staticTripId": "L0S1-1-1094-S02_063250_1..N15R",
+        "routeId": "1",
+        "stopId": "108N",
+        "stationId": "108",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "063400_1..S15R",
+        "staticTripId": "L0S1-1-1094-S02_063400_1..S15R",
+        "routeId": "1",
+        "stopId": "130S",
+        "stationId": "130",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "063800_1..N15R",
+        "staticTripId": "L0S1-1-1094-S02_063800_1..N15R",
+        "routeId": "1",
+        "stopId": "111N",
+        "stationId": "111",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "064000_1..S15R",
+        "staticTripId": "L0S1-1-1094-S02_064000_1..S15R",
+        "routeId": "1",
+        "stopId": "128S",
+        "stationId": "128",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "064300_1..N15R",
+        "staticTripId": "L0S1-1-1094-S02_064300_1..N15R",
+        "routeId": "1",
+        "stopId": "113N",
+        "stationId": "113",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "064500_1..S15R",
+        "staticTripId": "L0S1-1-1094-S02_064500_1..S15R",
+        "routeId": "1",
+        "stopId": "126S",
+        "stationId": "126",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      },
+      {
+        "realtimeTripId": "064800_1..N15R",
+        "staticTripId": "L0S1-1-1094-S02_064800_1..N15R",
+        "routeId": "1",
+        "stopId": "116N",
+        "stationId": "116",
+        "serviceDate": "2026-08-17",
+        "serviceId": "Weekday"
+      }
+    ],
+    "unresolved": 0,
+    "ambiguousTrips": 0,
+    "routeMismatches": 0,
+    "tripMismatches": 0,
+    "stopMismatches": 0,
+    "distinctRealtimeTrips": 10,
+    "mismatches": []
+  },
+  "materializedScheduleExample": [
+    {
+      "staticTripId": "L0S1-1-1094-S02_062400_1..S15R",
+      "stopId": "101S",
+      "stopSequence": 1,
+      "arrivalTime": {
+        "original": "10:24:00",
+        "serviceDate": "2026-08-17",
+        "normalizedLocalDateTime": "2026-08-17T10:24:00",
+        "secondsSinceServiceMidnight": 37440,
+        "dayOffset": 0
+      },
+      "departureTime": {
+        "original": "10:24:00",
+        "serviceDate": "2026-08-17",
+        "normalizedLocalDateTime": "2026-08-17T10:24:00",
+        "secondsSinceServiceMidnight": 37440,
+        "dayOffset": 0
+      }
+    },
+    {
+      "staticTripId": "L0S1-1-1094-S02_062400_1..S15R",
+      "stopId": "103S",
+      "stopSequence": 2,
+      "arrivalTime": {
+        "original": "10:25:30",
+        "serviceDate": "2026-08-17",
+        "normalizedLocalDateTime": "2026-08-17T10:25:30",
+        "secondsSinceServiceMidnight": 37530,
+        "dayOffset": 0
+      },
+      "departureTime": {
+        "original": "10:25:30",
+        "serviceDate": "2026-08-17",
+        "normalizedLocalDateTime": "2026-08-17T10:25:30",
+        "secondsSinceServiceMidnight": 37530,
+        "dayOffset": 0
+      }
+    },
+    {
+      "staticTripId": "L0S1-1-1094-S02_062400_1..S15R",
+      "stopId": "104S",
+      "stopSequence": 3,
+      "arrivalTime": {
+        "original": "10:27:00",
+        "serviceDate": "2026-08-17",
+        "normalizedLocalDateTime": "2026-08-17T10:27:00",
+        "secondsSinceServiceMidnight": 37620,
+        "dayOffset": 0
+      },
+      "departureTime": {
+        "original": "10:27:00",
+        "serviceDate": "2026-08-17",
+        "normalizedLocalDateTime": "2026-08-17T10:27:00",
+        "secondsSinceServiceMidnight": 37620,
+        "dayOffset": 0
+      }
+    }
+  ]
+}
