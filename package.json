@@ -11,6 +11,8 @@
     "phase2": "tsx src/phase2/cli.ts",
     "phase3": "tsx src/phase3/cli.ts",
     "phase3:once": "TRANSITPULSE_MAX_CYCLES=1 tsx src/phase3/cli.ts",
+    "phase4": "tsx src/phase4/cli.ts",
+    "phase4:aggregate": "tsx src/phase4/aggregate-cli.ts",
     "test": "tsx --test test/**/*.test.ts"
   },
   "dependencies": {

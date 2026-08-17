@@ -20,6 +20,19 @@ export type NormalizedStopTimeRecord = NormalizedTripRecord & {
   stopSequence: number | null;
 };
 
+export type NormalizedAlertRecord = {
+  feedName: string;
+  alertId: string;
+  feedTimestamp: string | null;
+  observedAt: string;
+  headerText: string;
+  descriptionText: string | null;
+  cause: string | null;
+  effect: string | null;
+  routeIds: string[];
+  stopIds: string[];
+};
+
 export type FeedFetchResult = {
   body: Uint8Array;
   status: number;
@@ -89,6 +102,16 @@ function firstNonNull(...values: Array<string | null>): string | null {
 
 function firstNumber(...values: Array<number | null>): number | null {
   return values.find((value) => value !== null) ?? null;
+}
+
+function translatedText(value: unknown): string | null {
+  const translations = record(value).translation;
+  if (!Array.isArray(translations)) return null;
+  for (const translation of translations) {
+    const value = text(record(translation).text);
+    if (value) return value;
+  }
+  return null;
 }
 
 export async function fetchFeed(
@@ -254,6 +277,58 @@ export function normalizeStopTimeRecords(
         ...stop,
       });
     }
+  }
+
+  return records;
+}
+
+/**
+ * Returns one normalized record for every service alert in the feed.
+ * The current API uses route associations for live alert filtering; stop and
+ * trip associations are retained as stop IDs where the feed supplies them.
+ */
+export function normalizeAlerts(
+  feed: unknown,
+  feedName: string,
+  observedAt: string,
+): NormalizedAlertRecord[] {
+  const root = record(feed);
+  const headerTimestamp = feedTimestamp(root);
+  const entities = Array.isArray(root.entity) ? root.entity : [];
+  const records: NormalizedAlertRecord[] = [];
+
+  for (const entityValue of entities) {
+    const entity = record(entityValue);
+    const alert = record(entity.alert);
+    const alertId = text(entity.id);
+    const headerText = translatedText(alert.headerText);
+    if (!alertId || !headerText) continue;
+
+    const routeIds = new Set<string>();
+    const stopIds = new Set<string>();
+    const informedEntities = Array.isArray(alert.informedEntity)
+      ? alert.informedEntity
+      : [];
+    for (const informedValue of informedEntities) {
+      const informed = record(informedValue);
+      const routeId = text(informed.routeId) ?? text(record(informed.trip).routeId);
+      const stopId = text(informed.stopId) ?? text(record(informed.trip).stopId);
+      if (routeId) routeIds.add(routeId);
+      if (stopId) stopIds.add(stopId);
+    }
+
+    records.push({
+      feedName,
+      alertId,
+      feedTimestamp: headerTimestamp,
+      observedAt,
+      headerText,
+      descriptionText: translatedText(alert.descriptionText),
+      cause: text(alert.cause),
+      effect: text(alert.effect),
+      routeIds: [...routeIds],
+      stopIds: [...stopIds],
+    });
   }
 
   return records;

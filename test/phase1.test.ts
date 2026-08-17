@@ -6,6 +6,7 @@ import {
   decodeFeed,
   distinctTripRecords,
   FeedDecodeError,
+  normalizeAlerts,
   normalizeStopTimeRecords,
   normalizeTripUpdates,
 } from "../src/phase1/index.js";
@@ -93,6 +94,38 @@ test("can normalize every stop-time update for persistence", () => {
       ["128N", 2],
     ],
   );
+});
+
+test("normalizes service alerts and route associations", () => {
+  const records = normalizeAlerts(
+    {
+      header: { timestamp: 1_755_447_600 },
+      entity: [
+        {
+          id: "alert-001",
+          alert: {
+            headerText: { translation: [{ text: "Train delayed" }] },
+            informedEntity: [{ routeId: "7" }, { trip: { routeId: "7" } }],
+          },
+        },
+      ],
+    },
+    "fixture",
+    "2026-08-17T15:20:04.000Z",
+  );
+
+  assert.deepEqual(records[0], {
+    feedName: "fixture",
+    alertId: "alert-001",
+    feedTimestamp: "2025-08-17T16:20:00.000Z",
+    observedAt: "2026-08-17T15:20:04.000Z",
+    headerText: "Train delayed",
+    descriptionText: null,
+    cause: null,
+    effect: null,
+    routeIds: ["7"],
+    stopIds: [],
+  });
 });
 
 test("exposes malformed protobuf as a decode failure", () => {

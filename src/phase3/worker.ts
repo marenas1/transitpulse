@@ -4,6 +4,7 @@ import {
   decodeFeed,
   distinctTripRecords,
   fetchFeed,
+  normalizeAlerts,
   normalizeStopTimeRecords,
   normalizeTripUpdates,
   type NormalizedStopTimeRecord,
@@ -12,6 +13,7 @@ import {
 import { resolveRealtimeSample, type ResolvedRealtimeRecord } from "../phase2/index.js";
 import type { StaticGtfsSnapshot } from "../phase2/gtfs.js";
 import {
+  alertObservationFromNormalized,
   stopObservationFromNormalized,
   tripObservationFromNormalized,
   type IngestionRunInput,
@@ -36,6 +38,7 @@ export type CycleResult = {
   status: "success" | "partial" | "failed";
   tripUpdates: number;
   stopUpdates: number;
+  alerts: number;
   unresolvedReferences: number;
   rejectedRecords: number;
   persistStats: PersistStats | null;
@@ -175,6 +178,7 @@ export class IngestionWorker {
     let feedTimestamp: string | null = null;
     let tripUpdates = 0;
     let stopUpdates = 0;
+    let alerts = 0;
 
     try {
       payload = await this.loadFeed();
@@ -189,9 +193,18 @@ export class IngestionWorker {
         this.config.feedName,
         payload.fetchedAt,
       );
+      const alertRecords = normalizeAlerts(
+        feed,
+        this.config.feedName,
+        payload.fetchedAt,
+      );
       tripUpdates = tripRecords.length;
       stopUpdates = stopRecords.length;
-      feedTimestamp = tripRecords.find((record) => record.feedTimestamp)?.feedTimestamp ?? null;
+      alerts = alertRecords.length;
+      feedTimestamp =
+        tripRecords.find((record) => record.feedTimestamp)?.feedTimestamp ??
+        alertRecords.find((record) => record.feedTimestamp)?.feedTimestamp ??
+        null;
       if (!feedTimestamp) throw new Error("Decoded feed has no usable feed timestamp");
 
       const resolution = resolveRealtimeSample(
@@ -217,6 +230,7 @@ export class IngestionWorker {
       const persistStats = await this.store.persistBatch({
         tripObservations: tripInputs.valid,
         stopTimeObservations: stopInputs.valid,
+        alerts: alertRecords.map(alertObservationFromNormalized),
       });
       const finishedAt = this.clock.now();
       const status =
@@ -240,6 +254,8 @@ export class IngestionWorker {
         duplicatesIgnored: persistStats.duplicatesIgnored,
         unresolvedReferenceRecords,
         rejectedRecords,
+        alertsSeen: alerts,
+        alertsUpserted: persistStats.alertsUpserted,
         errorCount: 0,
         durationMs: Date.now() - startedMilliseconds,
         errorMessage: null,
@@ -248,6 +264,7 @@ export class IngestionWorker {
         status,
         tripUpdates,
         stopUpdates,
+        alerts,
         unresolvedReferences: unresolvedReferenceRecords,
         rejectedRecords,
         persistStats,
@@ -273,6 +290,8 @@ export class IngestionWorker {
         duplicatesIgnored: 0,
         unresolvedReferenceRecords: 0,
         rejectedRecords: 0,
+        alertsSeen: alerts,
+        alertsUpserted: 0,
         errorCount: 1,
         durationMs: Date.now() - startedMilliseconds,
         errorMessage: message,
@@ -281,6 +300,7 @@ export class IngestionWorker {
         status: "failed",
         tripUpdates,
         stopUpdates,
+        alerts,
         unresolvedReferences: 0,
         rejectedRecords: 0,
         persistStats: null,

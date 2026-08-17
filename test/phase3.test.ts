@@ -35,8 +35,10 @@ class FakeObservationStore implements ObservationStore {
     return {
       tripCandidates: batch.tripObservations.length,
       stopCandidates: batch.stopTimeObservations.length,
+      alertCandidates: batch.alerts?.length ?? 0,
       tripInserted,
       stopInserted,
+      alertsUpserted: 0,
       duplicatesIgnored:
         batch.tripObservations.length +
         batch.stopTimeObservations.length -

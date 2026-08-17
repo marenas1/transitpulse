@@ -3,7 +3,11 @@ import { readFile } from "node:fs/promises";
 import { Pool, type PoolClient } from "pg";
 
 import type { StaticGtfsSnapshot } from "../phase2/gtfs.js";
-import type { NormalizedStopTimeRecord, NormalizedTripRecord } from "../phase1/feed.js";
+import type {
+  NormalizedAlertRecord,
+  NormalizedStopTimeRecord,
+  NormalizedTripRecord,
+} from "../phase1/feed.js";
 
 export type TripObservationInput = {
   feedName: string;
@@ -37,16 +41,31 @@ export type StopTimeObservationInput = {
   sourceEntityKey: string;
 };
 
+export type AlertObservationInput = {
+  feedName: string;
+  alertId: string;
+  feedTimestamp: string | null;
+  observedAt: string;
+  headerText: string;
+  descriptionText: string | null;
+  cause: string | null;
+  effect: string | null;
+  routeIds: string[];
+};
+
 export type PersistBatch = {
   tripObservations: TripObservationInput[];
   stopTimeObservations: StopTimeObservationInput[];
+  alerts?: AlertObservationInput[];
 };
 
 export type PersistStats = {
   tripCandidates: number;
   stopCandidates: number;
+  alertCandidates: number;
   tripInserted: number;
   stopInserted: number;
+  alertsUpserted: number;
   duplicatesIgnored: number;
 };
 
@@ -67,6 +86,8 @@ export type IngestionRunInput = {
   duplicatesIgnored: number;
   unresolvedReferenceRecords: number;
   rejectedRecords: number;
+  alertsSeen: number;
+  alertsUpserted: number;
   errorCount: number;
   durationMs: number;
   errorMessage: string | null;
@@ -128,11 +149,13 @@ export class PostgresObservationStore implements ObservationStore {
   }
 
   async migrate(): Promise<void> {
-    const migration = await readFile(
-      new URL("../../db/migrations/001_phase3.sql", import.meta.url),
-      "utf8",
-    );
-    await this.pool.query(migration);
+    for (const filename of ["001_phase3.sql", "002_phase4.sql"]) {
+      const migration = await readFile(
+        new URL(`../../db/migrations/${filename}`, import.meta.url),
+        "utf8",
+      );
+      await this.pool.query(migration);
+    }
   }
 
   async importStaticSnapshot(snapshot: StaticGtfsSnapshot): Promise<void> {
@@ -286,6 +309,45 @@ export class PostgresObservationStore implements ObservationStore {
       await client.query("BEGIN");
       let tripInserted = 0;
       let stopInserted = 0;
+      let alertsUpserted = 0;
+
+      for (const alert of batch.alerts ?? []) {
+        const result = await client.query(
+          `INSERT INTO service_alerts (
+            feed_name, alert_id, header_text, description_text, cause, effect,
+            first_seen_at, last_seen_at, feed_timestamp
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8)
+          ON CONFLICT (feed_name, alert_id) DO UPDATE SET
+            header_text = EXCLUDED.header_text,
+            description_text = EXCLUDED.description_text,
+            cause = EXCLUDED.cause,
+            effect = EXCLUDED.effect,
+            last_seen_at = EXCLUDED.last_seen_at,
+            feed_timestamp = EXCLUDED.feed_timestamp
+          RETURNING alert_id`,
+          [
+            alert.feedName,
+            alert.alertId,
+            alert.headerText,
+            alert.descriptionText,
+            alert.cause,
+            alert.effect,
+            alert.observedAt,
+            alert.feedTimestamp,
+          ],
+        );
+        alertsUpserted += result.rowCount ?? 0;
+
+        for (const routeId of alert.routeIds) {
+          await client.query(
+            `INSERT INTO alert_routes (feed_name, alert_id, route_id)
+             SELECT $1, $2, $3
+             WHERE EXISTS (SELECT 1 FROM routes WHERE route_id = $3)
+             ON CONFLICT DO NOTHING`,
+            [alert.feedName, alert.alertId, routeId],
+          );
+        }
+      }
 
       for (const group of chunks(batch.tripObservations, CHUNK_SIZE)) {
         tripInserted += await insertRows(
@@ -368,8 +430,10 @@ export class PostgresObservationStore implements ObservationStore {
       return {
         tripCandidates: batch.tripObservations.length,
         stopCandidates: batch.stopTimeObservations.length,
+        alertCandidates: batch.alerts?.length ?? 0,
         tripInserted,
         stopInserted,
+        alertsUpserted,
         duplicatesIgnored: totalCandidates - tripInserted - stopInserted,
       };
     } catch (error) {
@@ -387,9 +451,9 @@ export class PostgresObservationStore implements ObservationStore {
         http_status, bytes_received, entities_seen, trip_updates_seen,
         stop_updates_seen, trip_observations_inserted, stop_observations_inserted,
         duplicates_ignored, unresolved_reference_records, rejected_records,
-        error_count, duration_ms, error_message
+        alerts_seen, alerts_upserted, error_count, duration_ms, error_message
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
       )`,
       [
         run.feedName,
@@ -408,6 +472,8 @@ export class PostgresObservationStore implements ObservationStore {
         run.duplicatesIgnored,
         run.unresolvedReferenceRecords,
         run.rejectedRecords,
+        run.alertsSeen,
+        run.alertsUpserted,
         run.errorCount,
         run.durationMs,
         run.errorMessage,
@@ -463,5 +529,21 @@ export function stopObservationFromNormalized(
     delaySeconds: record.delaySeconds,
     stopSequence: record.stopSequence,
     sourceEntityKey: `${record.tripId}:${record.stopId}:${record.stopSequence ?? "unknown"}`,
+  };
+}
+
+export function alertObservationFromNormalized(
+  record: NormalizedAlertRecord,
+): AlertObservationInput {
+  return {
+    feedName: record.feedName,
+    alertId: record.alertId,
+    feedTimestamp: record.feedTimestamp,
+    observedAt: record.observedAt,
+    headerText: record.headerText,
+    descriptionText: record.descriptionText,
+    cause: record.cause,
+    effect: record.effect,
+    routeIds: record.routeIds,
   };
 }
