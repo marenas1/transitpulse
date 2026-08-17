@@ -16,6 +16,10 @@ export type NormalizedTripRecord = {
   delaySeconds: number | null;
 };
 
+export type NormalizedStopTimeRecord = NormalizedTripRecord & {
+  stopSequence: number | null;
+};
+
 export type FeedFetchResult = {
   body: Uint8Array;
   status: number;
@@ -143,6 +147,7 @@ function feedTimestamp(feed: UnknownRecord): string | null {
 
 function stopTimeRecord(stopTimeUpdate: unknown): {
   stopId: string | null;
+  stopSequence: number | null;
   scheduledArrival: string | null;
   predictedArrival: string | null;
   delaySeconds: number | null;
@@ -153,6 +158,7 @@ function stopTimeRecord(stopTimeUpdate: unknown): {
 
   return {
     stopId: text(update.stopId),
+    stopSequence: numberValue(update.stopSequence),
     scheduledArrival: null,
     predictedArrival: firstNonNull(
       isoFromEpochSeconds(arrival.time),
@@ -206,6 +212,48 @@ export function normalizeTripUpdates(
       predictedArrival: firstStop.predictedArrival,
       delaySeconds: firstStop.delaySeconds,
     });
+  }
+
+  return records;
+}
+
+/**
+ * Returns one normalized record for every stop-time update in the feed.
+ * Phase 1 uses a representative trip row for its probe; Phase 3 persists
+ * this complete stop-level history.
+ */
+export function normalizeStopTimeRecords(
+  feed: unknown,
+  feedName: string,
+  observedAt: string,
+): NormalizedStopTimeRecord[] {
+  const root = record(feed);
+  const headerTimestamp = feedTimestamp(root);
+  const entities = Array.isArray(root.entity) ? root.entity : [];
+  const records: NormalizedStopTimeRecord[] = [];
+
+  for (const entity of entities) {
+    const tripUpdate = record(record(entity).tripUpdate);
+    const trip = record(tripUpdate.trip);
+    const tripId = text(trip.tripId);
+    if (!tripId) continue;
+
+    const stopUpdates = Array.isArray(tripUpdate.stopTimeUpdate)
+      ? tripUpdate.stopTimeUpdate
+      : [];
+    for (const stopUpdate of stopUpdates) {
+      const stop = stopTimeRecord(stopUpdate);
+      records.push({
+        feedName,
+        feedTimestamp: headerTimestamp,
+        observedAt,
+        routeId: text(trip.routeId),
+        tripId,
+        directionId: text(trip.directionId),
+        startTime: text(trip.startTime),
+        ...stop,
+      });
+    }
   }
 
   return records;

@@ -9,16 +9,20 @@
     "phase1": "tsx src/phase1/cli.ts",
     "phase1:fixture": "TRANSITPULSE_INPUT_FILE=fixtures/mta-nyct-gtfs.bin tsx src/phase1/cli.ts",
     "phase2": "tsx src/phase2/cli.ts",
+    "phase3": "tsx src/phase3/cli.ts",
+    "phase3:once": "TRANSITPULSE_MAX_CYCLES=1 tsx src/phase3/cli.ts",
     "test": "tsx --test test/**/*.test.ts"
   },
   "dependencies": {
     "csv-parse": "^6.1.0",
     "dotenv": "^17.2.2",
     "fflate": "^0.8.2",
-    "gtfs-realtime-bindings": "^2.2.0"
+    "gtfs-realtime-bindings": "^2.2.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "@types/pg": "^8.15.5",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   }

@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:15
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: transitpulse
+      POSTGRES_PASSWORD: transitpulse
+      POSTGRES_DB: transitpulse
+    volumes:
+      - transitpulse-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  transitpulse-postgres-data:

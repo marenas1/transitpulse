@@ -6,6 +6,7 @@ import {
   decodeFeed,
   distinctTripRecords,
   FeedDecodeError,
+  normalizeStopTimeRecords,
   normalizeTripUpdates,
 } from "../src/phase1/index.js";
 
@@ -61,6 +62,36 @@ test("keeps only one representative record per distinct trip", () => {
   assert.deepEqual(
     distinctTripRecords(records).map((record) => record.tripId),
     ["a", "b"],
+  );
+});
+
+test("can normalize every stop-time update for persistence", () => {
+  const records = normalizeStopTimeRecords(
+    {
+      header: { timestamp: 1_755_447_600 },
+      entity: [
+        {
+          tripUpdate: {
+            trip: { routeId: "2", tripId: "trip-001" },
+            stopTimeUpdate: [
+              { stopId: "127N", stopSequence: 1, arrival: { delay: 60 } },
+              { stopId: "128N", stopSequence: 2, arrival: { delay: 120 } },
+            ],
+          },
+        },
+      ],
+    },
+    "fixture",
+    "2026-08-17T15:20:04.000Z",
+  );
+
+  assert.equal(records.length, 2);
+  assert.deepEqual(
+    records.map((record) => [record.stopId, record.stopSequence]),
+    [
+      ["127N", 1],
+      ["128N", 2],
+    ],
   );
 });
 
